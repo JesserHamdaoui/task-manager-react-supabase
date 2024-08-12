@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../config/supabaseClient";
 
-import { Card, CardHeader, CardBody, Divider } from "@nextui-org/react";
-import { Checkbox } from "@nextui-org/checkbox";
+import TaskSkeleton from "../components/TaskSkeleton";
+import TaskCard from "../components/TaskCard";
 
 type Task = {
   id: Number;
@@ -15,9 +15,11 @@ type Task = {
 
 export default function Home() {
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchTasks = async () => {
       const { data, error } = await supabase.from("tasks").select();
 
@@ -25,10 +27,12 @@ export default function Home() {
         setFetchError("Could not fetch tasks");
         setTasks([]);
         console.log(error);
+        setIsLoading(false);
       }
       if (data) {
         setTasks(data);
         setFetchError(null);
+        setIsLoading(false);
       }
     };
     fetchTasks();
@@ -39,27 +43,15 @@ export default function Home() {
       <div className="max-w-[1000px] m-auto">
         {fetchError ? (
           <p>{fetchError}</p>
+        ) : isLoading ? (
+          <>
+            <TaskSkeleton />
+            <TaskSkeleton />
+            <TaskSkeleton />
+          </>
         ) : (
           tasks.map((task) => {
-            return (
-              <Card key={task.id} className="my-5">
-                <CardHeader className="flex justify-between">
-                  {task.title}
-
-                  <Checkbox checked={task.is_complete} onChange={() => {}} />
-                </CardHeader>
-                <Divider />
-                <CardBody className="min-h-32">
-                  <p>{task.description}</p>
-                  <p className="text-blue-500">
-                    Deadline:{" "}
-                    {task.deadline.toString().slice(0, 10) +
-                      " " +
-                      task.deadline.toString().slice(11, 16)}
-                  </p>
-                </CardBody>
-              </Card>
-            );
+            return <TaskCard key={task.id.toString()} {...task} />;
           })
         )}
       </div>
