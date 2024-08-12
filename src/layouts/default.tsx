@@ -1,3 +1,4 @@
+import SearchProvider from "../Providers/SearchProvider";
 import NavbarComponent from "../components/NavbarComponent";
 
 export default function DefaultLayout({
@@ -7,8 +8,10 @@ export default function DefaultLayout({
 }) {
   return (
     <>
-      <NavbarComponent />
-      {children}
+      <SearchProvider>
+        <NavbarComponent />
+        {children}
+      </SearchProvider>
     </>
   );
 }

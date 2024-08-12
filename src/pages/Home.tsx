@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { supabase } from "../config/supabaseClient";
 
 import TaskSkeleton from "../components/TaskSkeleton";
@@ -6,6 +6,7 @@ import TaskCard from "../components/TaskCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import FiltersPopover from "../components/FiltersPopover";
+import { SearchContext } from "../Providers/SearchProvider";
 
 type Task = {
   id: Number;
@@ -32,6 +33,12 @@ export default function Home() {
     setIsDeadlineDisplayed(!isDeadlineDisplayed);
   };
 
+  const searchContext = useContext(SearchContext);
+  if (!searchContext) {
+    throw new Error("SearchContext must be used within a SearchProvider");
+  }
+  const { search } = searchContext;
+
   useEffect(() => {
     setIsLoading(true);
     const fetchTasks = async () => {
@@ -49,8 +56,16 @@ export default function Home() {
       if (data) {
         setTasks(data);
 
+        if (search) {
+          setTasks(
+            tasks.filter((task) =>
+              task.title.toLowerCase().includes(search.toLowerCase())
+            )
+          );
+        }
+
         if (!isCompleteDisplayed) {
-          setTasks(data.filter((task) => !task.is_complete));
+          setTasks(tasks.filter((task) => !task.is_complete));
         }
 
         if (isDeadlineDisplayed) {
@@ -61,7 +76,7 @@ export default function Home() {
       }
     };
     fetchTasks();
-  }, [isCompleteDisplayed, isDeadlineDisplayed]);
+  }, [isCompleteDisplayed, isDeadlineDisplayed, search]);
 
   return (
     <div className="">

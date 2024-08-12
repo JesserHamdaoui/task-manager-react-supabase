@@ -54,6 +54,8 @@ export default function TaskCard(task: {
               deadline: task.deadline,
               id: task.id,
             }}
+            checkboxHandler={checkboxHandler}
+            isComplete={isComplete}
           />
         </CardHeader>
         <Divider />

@@ -11,9 +11,17 @@ import {
 import CreateModal from "./CreateModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { SearchContext } from "../Providers/SearchProvider";
+import { useContext } from "react";
 
 export default function NavbarComponent() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const searchContext = useContext(SearchContext);
+  if (!searchContext) {
+    throw new Error("SearchContext must be used within a SearchProvider");
+  }
+  const { search, setSearch } = searchContext;
 
   return (
     <>
@@ -34,6 +42,10 @@ export default function NavbarComponent() {
             size="sm"
             startContent={<FontAwesomeIcon icon={faSearch} />}
             type="search"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
           />
         </NavbarContent>
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
