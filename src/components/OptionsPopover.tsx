@@ -61,7 +61,7 @@ export default function OptionsPopover({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="bg-[#18181b] border-1 border-[#3f3f46]">
-          <div className="flex flex-col py-2 ">
+          <div className="flex flex-col py-2 items-start">
             <Button
               color="primary"
               startContent={<FontAwesomeIcon icon={faCheck} />}

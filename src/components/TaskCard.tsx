@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar, faClock } from "@fortawesome/free-solid-svg-icons";
 
 import { supabase } from "../config/supabaseClient";
+import { useEffect, useState } from "react";
 
 export default function TaskCard(task: {
   title: string;
@@ -13,32 +14,34 @@ export default function TaskCard(task: {
   id: Number;
   is_complete: boolean;
 }) {
-  const checkboxHandler = async (e) => {
-    console.log("Ahla");
-    const is_complete = e.target.isSelected;
-    console.log(is_complete);
+  const [isComplete, setIsComplete] = useState(task.is_complete);
+
+  const checkboxHandler = async () => {
     const { data, error } = await supabase
       .from("tasks")
-      .update({ is_complete })
+      .update({ is_complete: !isComplete })
       .eq("id", task.id);
     if (error) {
       console.log(error);
     } else {
-      window.location.reload();
+      setIsComplete(!isComplete);
     }
   };
 
   return (
     <>
-      <Card key={task.id.toString()} className="my-5 px-7">
+      <Card
+        key={task.id.toString()}
+        className="my-5 px-7"
+        isDisabled={isComplete}
+      >
         <CardHeader className="flex justify-between">
           <span className="flex flex-row items-center gap-2">
             <Checkbox
-              checked={task.is_complete}
-              onValueChange={() => {
-                checkboxHandler;
+              onChange={() => {
+                checkboxHandler();
               }}
-              isSelected={task.is_complete ? true : false}
+              isSelected={isComplete}
             />
             <h1 className="inline font-semibold text-2xl capitalize">
               {task.title}
