@@ -1,7 +1,7 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
-import { DateInput } from "@nextui-org/react";
+import { DateInput, Divider } from "@nextui-org/react";
 import { CalendarDate } from "@internationalized/date";
 import { useState } from "react";
 import { supabase } from "../../config/supabaseClient";
@@ -9,6 +9,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { faFacebook, faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 export default function Signup() {
   const validationSchema = Yup.object({
@@ -77,9 +78,50 @@ export default function Signup() {
     },
   });
 
+  const handleGoogleAuth = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "https://localhost:5173/signup",
+      },
+    });
+    if (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleFacebookAuth = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+      options: {
+        redirectTo: "https://localhost:5173/signup",
+      },
+    });
+    if (error) {
+      setError(error.message);
+    }
+  };
+
   return (
     <Card>
       <CardBody className="p-10">
+        <div className="flex flex-row justify-between gap-3">
+          <Button
+            isIconOnly
+            className="w-1/2 py-7 text-lg"
+            onPress={handleGoogleAuth}
+          >
+            <FontAwesomeIcon icon={faGoogle} />
+          </Button>
+          <Button
+            isIconOnly
+            className="w-1/2 py-7 text-lg"
+            onPress={handleFacebookAuth}
+          >
+            <FontAwesomeIcon icon={faFacebook} />
+          </Button>
+        </div>
+        <Divider className="my-7" />
         <form
           className="flex flex-col gap-7 min-w-[800px]"
           onSubmit={formik.handleSubmit}
