@@ -7,94 +7,183 @@ import { useState } from "react";
 import { supabase } from "../../config/supabaseClient";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as Yup from "yup";
+import { useFormik } from "formik";
 
 export default function Signup() {
-  const [authError, setAuthError] = useState<string | null>(null);
+  const validationSchema = Yup.object({
+    email: Yup.string().email("Invalid email format").required("Required"),
+    firstName: Yup.string()
+      .required("Required")
+      .max(50, "First name must be at most 50 characters")
+      .min(2, "First name must be at least 2 characters")
+      .matches(/^[A-Za-z]+$/, "First name must not contain numbers"),
+    lastName: Yup.string()
+      .required("Required")
+      .max(50, "Last name must be at most 50 characters")
+      .min(2, "Last name must be at least 2 characters")
+      .matches(/^[A-Za-z]+$/, "Last name must not contain numbers"),
+    phoneNumber: Yup.string()
+      .required("Required")
+      .matches(/^(2|9|5|4|7|3)[0-9]{7}$/, "Invalid phone number"),
+    birthDate: Yup.date()
+      .required("Required")
+      .max(new Date(), "Birth date must be in the past"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Required"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Required"),
+  });
+
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
 
-  const handleSignup = async () => {
-    setIsLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          birth_date: birthDate,
-          phone_number: phoneNumber,
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      birthDate: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      setIsLoading(true);
+      setError(null);
+      const { error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            first_name: values.firstName,
+            last_name: values.lastName,
+            birth_date: values.birthDate,
+            phone_number: values.phoneNumber,
+          },
         },
-      },
-    });
+      });
 
-    if (error) {
-      setAuthError(error.message);
-    } else if (data) {
-    }
-  };
+      if (error) {
+        setError(error.message);
+      }
+      setIsLoading(false);
+    },
+  });
 
   return (
     <Card>
       <CardBody className="p-10">
-        <form action="" className="flex flex-col gap-7 min-w-[800px]">
+        <form
+          className="flex flex-col gap-7 min-w-[800px]"
+          onSubmit={formik.handleSubmit}
+        >
           <div className="flex flex-row gap-3">
             <Input
               label="First name"
               type="text"
               className="max-w-1/2"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              name="firstName"
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              errorMessage={
+                formik.touched.firstName && formik.errors.firstName
+                  ? formik.errors.firstName
+                  : null
+              }
+              isInvalid={
+                !!(formik.touched.firstName && formik.errors.firstName)
+              }
             />
             <Input
               label="Last name"
               type="text"
               className="max-w-1/2"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              name="lastName"
+              value={formik.values.lastName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              errorMessage={
+                formik.touched.lastName && formik.errors.lastName
+                  ? formik.errors.lastName
+                  : null
+              }
+              isInvalid={!!(formik.touched.lastName && formik.errors.lastName)}
             />
           </div>
           <Input
-            label="email"
+            label="Email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            errorMessage={
+              formik.touched.email && formik.errors.email
+                ? formik.errors.email
+                : null
+            }
+            isInvalid={!!(formik.touched.email && formik.errors.email)}
           />
           <Input
             label="Phone number"
             type="tel"
+            name="phoneNumber"
             startContent={"(+216)"}
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            value={formik.values.phoneNumber}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            errorMessage={
+              formik.touched.phoneNumber && formik.errors.phoneNumber
+                ? formik.errors.phoneNumber
+                : null
+            }
+            isInvalid={
+              !!(formik.touched.phoneNumber && formik.errors.phoneNumber)
+            }
           />
           <DateInput
             label="Birth date"
+            name="birthDate"
             value={
-              birthDate
+              formik.values.birthDate
                 ? new CalendarDate(
-                    parseInt(birthDate.split("-")[0]),
-                    parseInt(birthDate.split("-")[1]),
-                    parseInt(birthDate.split("-")[2])
+                    parseInt(formik.values.birthDate.split("-")[0]),
+                    parseInt(formik.values.birthDate.split("-")[1]),
+                    parseInt(formik.values.birthDate.split("-")[2])
                   )
                 : null
             }
-            onChange={(date) => setBirthDate(date.toString())}
+            onChange={(date) =>
+              formik.setFieldValue("birthDate", date.toString())
+            }
+            onBlur={formik.handleBlur}
+            errorMessage={
+              formik.touched.birthDate && formik.errors.birthDate
+                ? formik.errors.birthDate
+                : null
+            }
+            isInvalid={!!(formik.touched.birthDate && formik.errors.birthDate)}
           />
           <Input
             label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            errorMessage={
+              formik.touched.password && formik.errors.password
+                ? formik.errors.password
+                : null
+            }
+            isInvalid={!!(formik.touched.password && formik.errors.password)}
             endContent={
               <button
                 className="focus:outline-none"
@@ -116,8 +205,20 @@ export default function Signup() {
           />
           <Input
             label="Confirm password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            name="confirmPassword"
+            value={formik.values.confirmPassword}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            errorMessage={
+              formik.touched.confirmPassword && formik.errors.confirmPassword
+                ? formik.errors.confirmPassword
+                : null
+            }
+            isInvalid={
+              !!(
+                formik.touched.confirmPassword && formik.errors.confirmPassword
+              )
+            }
             endContent={
               <button
                 className="focus:outline-none"
@@ -139,12 +240,12 @@ export default function Signup() {
             }
             type={isConfirmPasswordVisible ? "text" : "password"}
           />
-          <Button type="submit" onPress={handleSignup} isLoading={isLoading}>
+          <Button type="submit" isLoading={isLoading}>
             Submit
           </Button>
-          {authError && (
-            <p className="text-[#F31260] bg-[#310413] px-3 py-2 rounded-lg border-1 border-[#F31260]">
-              {authError}
+          {error && (
+            <p className="text-[#F31260] bg-[#310413] px-3 py-2 rounded-lg ">
+              {error}
             </p>
           )}
         </form>

@@ -2,7 +2,6 @@ import { supabase } from "../config/supabaseClient";
 import { Session, User } from "@supabase/supabase-js";
 import { useContext, useState, useEffect, createContext } from "react";
 
-// create a context for authentication
 const AuthContext = createContext<{
   session: Session | null | undefined;
   user: User | null | undefined;
@@ -47,7 +46,6 @@ export const AuthProvider = ({ children }: any) => {
     signOut: () => supabase.auth.signOut(),
   };
 
-  // use a provider to pass down the value
   return (
     <AuthContext.Provider value={value}>
       {!loading && children}
@@ -55,7 +53,6 @@ export const AuthProvider = ({ children }: any) => {
   );
 };
 
-// export the useAuth hook
 export const useAuth = () => {
   return useContext(AuthContext);
 };
