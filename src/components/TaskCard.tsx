@@ -5,15 +5,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar, faClock } from "@fortawesome/free-solid-svg-icons";
 
 import { supabase } from "../config/supabaseClient";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function TaskCard(task: {
+export default function TaskCard({
+  title,
+  description,
+  deadline,
+  id,
+  is_complete,
+  fetchTasks,
+}: {
   title: string;
   description: string;
   deadline: Date;
   id: Number;
   is_complete: boolean;
+  fetchTasks: () => Promise<void>;
 }) {
+  const task = { title, description, deadline, id, is_complete };
+
   const [isComplete, setIsComplete] = useState(task.is_complete);
 
   const checkboxHandler = async () => {
@@ -21,6 +31,7 @@ export default function TaskCard(task: {
       .from("tasks")
       .update({ is_complete: !isComplete })
       .eq("id", task.id);
+
     if (error) {
       console.log(error);
     } else {
@@ -54,6 +65,7 @@ export default function TaskCard(task: {
               deadline: task.deadline,
               id: task.id,
             }}
+            fetchTasks={fetchTasks}
             checkboxHandler={checkboxHandler}
             isComplete={isComplete}
           />

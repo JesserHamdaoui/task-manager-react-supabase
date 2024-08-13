@@ -7,12 +7,19 @@ import {
   Button,
   useDisclosure,
   Input,
+  User,
 } from "@nextui-org/react";
 import CreateModal from "./CreateModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faSearch,
+  faSignOutAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import { SearchContext } from "../Providers/SearchProvider";
 import { useContext } from "react";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "../Providers/AuthProvider";
 
 export default function NavbarComponent() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -23,11 +30,17 @@ export default function NavbarComponent() {
   }
   const { search, setSearch } = searchContext;
 
+  const location = useLocation();
+
+  const { session, user, signOut } = useAuth();
+
   return (
     <>
-      <Navbar>
+      <Navbar className="flex flex-col justify-between">
         <NavbarBrand>
-          <p className="font-bold text-inherit">Task Manger</p>
+          <Link href="/">
+            <p className="font-bold text-inherit">Task Manger</p>
+          </Link>
         </NavbarBrand>
         <NavbarContent as="div" className="items-center" justify="end">
           <Input
@@ -46,6 +59,9 @@ export default function NavbarComponent() {
             onChange={(e) => {
               setSearch(e.target.value);
             }}
+            isDisabled={
+              location.pathname === "/login" || location.pathname === "/signup"
+            }
           />
         </NavbarContent>
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -56,21 +72,43 @@ export default function NavbarComponent() {
               onPress={onOpen}
               startContent={<FontAwesomeIcon icon={faPlus} />}
               className="items-center"
+              isDisabled={
+                location.pathname === "/login" ||
+                location.pathname === "/signup"
+              }
             >
               Create a task
             </Button>
           </NavbarItem>
         </NavbarContent>
-        <NavbarContent justify="end">
-          <NavbarItem className="hidden lg:flex">
-            <Link href="/login">Login</Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Button as={Link} color="primary" href="/signup" variant="flat">
-              Sign Up
+
+        {session ? (
+          <>
+            <User
+              name={`${user?.user_metadata.first_name} ${user?.user_metadata.last_name}`}
+              description={user?.user_metadata.email}
+            />
+            <Button
+              variant="light"
+              color="danger"
+              onPress={signOut}
+              startContent={<FontAwesomeIcon icon={faSignOutAlt} />}
+            >
+              Logout
             </Button>
-          </NavbarItem>
-        </NavbarContent>
+          </>
+        ) : (
+          <NavbarContent justify="end">
+            <NavbarItem className="hidden lg:flex">
+              <Link href="/login">Login</Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Button as={Link} color="primary" href="/signup" variant="flat">
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </NavbarContent>
+        )}
       </Navbar>
       <CreateModal isOpen={isOpen} onOpenChange={onOpenChange} />
     </>

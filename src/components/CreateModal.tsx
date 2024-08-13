@@ -48,7 +48,8 @@ export default function CreateModal({
     if (error) {
       setError("Could not create task");
       setIsLoading(false);
-    } else {
+    }
+    if (data) {
       setTitle("");
       setDescription("");
       setDeadlineDate("");

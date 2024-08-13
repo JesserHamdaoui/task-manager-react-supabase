@@ -21,10 +21,12 @@ export default function OptionsPopover({
   values,
   checkboxHandler,
   isComplete,
+  fetchTasks,
 }: {
   values: { title: string; description: string; deadline: Date; id: Number };
   checkboxHandler: () => void;
   isComplete: boolean;
+  fetchTasks: () => Promise<void>;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -37,10 +39,10 @@ export default function OptionsPopover({
       },
     ]);
     if (error) {
-      // TODO: add a toaster
       console.log(error);
-    } else {
-      window.location.reload();
+    }
+    if (data) {
+      fetchTasks();
     }
   };
 
@@ -51,8 +53,9 @@ export default function OptionsPopover({
       .eq("id", values.id);
     if (error) {
       console.log(error);
-    } else {
-      window.location.reload();
+    }
+    if (data) {
+      fetchTasks();
     }
   };
 
@@ -112,6 +115,7 @@ export default function OptionsPopover({
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         defaultValues={values}
+        fetchTasks={fetchTasks}
       />
     </>
   );

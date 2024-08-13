@@ -19,6 +19,7 @@ export default function ModifyModal({
   isOpen,
   onOpenChange,
   defaultValues,
+  fetchTasks,
 }: {
   isOpen: boolean;
   onOpenChange: (value: boolean) => void;
@@ -28,6 +29,7 @@ export default function ModifyModal({
     deadline: Date;
     id: Number;
   };
+  fetchTasks: () => Promise<void>;
 }) {
   const [title, setTitle] = useState(defaultValues.title);
   const [description, setDescription] = useState(defaultValues.description);
@@ -39,6 +41,17 @@ export default function ModifyModal({
   );
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const deadlineDateFormated = new CalendarDate(
+    new Date(deadlineDate).getFullYear(),
+    new Date(deadlineDate).getMonth() + 1,
+    new Date(deadlineDate).getDate()
+  );
+
+  const deadlineTimeFormated = new Time(
+    parseInt(deadlineTime.split(":")[0]),
+    parseInt(deadlineTime.split(":")[1])
+  );
 
   const submitHandler = async () => {
     setIsLoading(true);
@@ -70,15 +83,12 @@ export default function ModifyModal({
     if (error) {
       setError("Could not modify task");
       setIsLoading(false);
-    } else {
-      setTitle("");
-      setDescription("");
-      setDeadlineDate("");
-      setDeadlineTime("");
+    }
+    if (data) {
       setError(null);
       setIsLoading(false);
       onOpenChange(false);
-      window.location.reload();
+      fetchTasks();
     }
   };
 
@@ -108,19 +118,12 @@ export default function ModifyModal({
                     <DateInput
                       label="Deadline Date"
                       onChange={(value) => setDeadlineDate(value.toString())}
-                      defaultValue={
-                        new CalendarDate(
-                          new Date(deadlineDate).getFullYear(),
-                          new Date(deadlineDate).getMonth(),
-                          new Date(deadlineDate).getDate()
-                        )
-                      }
+                      defaultValue={deadlineDateFormated}
                     />
                     <TimeInput
                       label="Deadline Time"
                       onChange={(value) => setDeadlineTime(value.toString())}
-                      //   TODO: Fix the time input
-                      defaultValue={new Time(new Date(deadlineTime).getTime())}
+                      defaultValue={deadlineTimeFormated}
                     />
                   </div>
                   {error && (
