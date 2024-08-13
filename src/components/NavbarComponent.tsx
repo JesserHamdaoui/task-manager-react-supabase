@@ -7,19 +7,15 @@ import {
   Button,
   useDisclosure,
   Input,
-  User,
 } from "@nextui-org/react";
 import CreateModal from "./CreateModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-  faSearch,
-  faSignOutAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { SearchContext } from "../Providers/SearchProvider";
 import { useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/AuthProvider";
+import ProfilePopover from "./ProfilePopover";
 
 export default function NavbarComponent() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -32,7 +28,7 @@ export default function NavbarComponent() {
 
   const location = useLocation();
 
-  const { session, user, signOut } = useAuth();
+  const { session } = useAuth();
 
   return (
     <>
@@ -83,24 +79,7 @@ export default function NavbarComponent() {
         </NavbarContent>
 
         {session ? (
-          <>
-            <User
-              name={
-                user?.user_metadata.name
-                  ? user?.user_metadata.name
-                  : `${user?.user_metadata.first_name} ${user?.user_metadata.last_name}`
-              }
-              description={user?.user_metadata.email}
-            />
-            <Button
-              variant="light"
-              color="danger"
-              onPress={signOut}
-              startContent={<FontAwesomeIcon icon={faSignOutAlt} />}
-            >
-              Logout
-            </Button>
-          </>
+          <ProfilePopover />
         ) : (
           <NavbarContent justify="end">
             <NavbarItem className="hidden lg:flex">
