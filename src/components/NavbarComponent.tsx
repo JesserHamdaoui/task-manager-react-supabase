@@ -85,7 +85,11 @@ export default function NavbarComponent() {
         {session ? (
           <>
             <User
-              name={`${user?.user_metadata.first_name} ${user?.user_metadata.last_name}`}
+              name={
+                user?.user_metadata.name
+                  ? user?.user_metadata.name
+                  : `${user?.user_metadata.first_name} ${user?.user_metadata.last_name}`
+              }
               description={user?.user_metadata.email}
             />
             <Button

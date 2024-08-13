@@ -7,6 +7,8 @@ import { useState } from "react";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { Divider } from "@nextui-org/react";
+import { faFacebook, faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email format").required("Required"),
@@ -45,9 +47,51 @@ export default function Login() {
     },
   });
 
+  const handleGoogleAuth = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "https://localhost:5173/signup",
+      },
+    });
+    if (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleFacebookAuth = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+      options: {
+        redirectTo: "https://localhost:5173/signup",
+      },
+    });
+    if (error) {
+      setError(error.message);
+      console.log(error);
+    }
+  };
+
   return (
     <Card>
       <CardBody className="p-10">
+        <div className="flex flex-row justify-between gap-3">
+          <Button
+            isIconOnly
+            className="w-1/2 py-7 text-lg"
+            onPress={handleGoogleAuth}
+          >
+            <FontAwesomeIcon icon={faGoogle} />
+          </Button>
+          <Button
+            isIconOnly
+            className="w-1/2 py-7 text-lg"
+            onPress={handleFacebookAuth}
+          >
+            <FontAwesomeIcon icon={faFacebook} />
+          </Button>
+        </div>
+        <Divider className="my-7" />
         <form
           onSubmit={formik.handleSubmit}
           className="flex flex-col gap-7 min-w-[800px]"
