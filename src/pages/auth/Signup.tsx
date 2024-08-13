@@ -82,7 +82,7 @@ export default function Signup() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "https://localhost:5173/signup",
+        redirectTo: "/",
       },
     });
     if (error) {
@@ -94,7 +94,7 @@ export default function Signup() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "facebook",
       options: {
-        redirectTo: "https://localhost:5173/signup",
+        redirectTo: "/",
       },
     });
     if (error) {
