@@ -75,7 +75,7 @@ export default function ModifyModal({
     }
 
     const deadline = new Date(deadlineDate + " " + deadlineTime);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("tasks")
       .update({ title, description, deadline })
       .eq("id", defaultValues.id);
@@ -83,8 +83,7 @@ export default function ModifyModal({
     if (error) {
       setError("Could not modify task");
       setIsLoading(false);
-    }
-    if (data) {
+    } else {
       setError(null);
       setIsLoading(false);
       onOpenChange(false);

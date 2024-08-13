@@ -4,6 +4,11 @@ import {
   PopoverContent,
   Button,
   useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "@nextui-org/react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,10 +33,11 @@ export default function OptionsPopover({
   isComplete: boolean;
   fetchTasks: () => Promise<void>;
 }) {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const modifyModal = useDisclosure();
+  const deleteDialogModal = useDisclosure();
 
   const dublicateHandler = async () => {
-    const { data, error } = await supabase.from("tasks").insert([
+    const { error } = await supabase.from("tasks").insert([
       {
         title: values.title,
         description: values.description,
@@ -39,21 +45,17 @@ export default function OptionsPopover({
       },
     ]);
     if (error) {
-    }
-    if (data) {
+    } else {
       fetchTasks();
     }
   };
 
   const deleteHandler = async () => {
-    const { data, error } = await supabase
-      .from("tasks")
-      .delete()
-      .eq("id", values.id);
+    const { error } = await supabase.from("tasks").delete().eq("id", values.id);
     if (error) {
-    }
-    if (data) {
+    } else {
       fetchTasks();
+      deleteDialogModal.onClose();
     }
   };
 
@@ -92,7 +94,7 @@ export default function OptionsPopover({
             radius="md"
             variant="light"
             className="w-full flex justify-start"
-            onPress={onOpen}
+            onPress={modifyModal.onOpen}
           >
             Edit
           </Button>
@@ -102,7 +104,7 @@ export default function OptionsPopover({
             radius="md"
             variant="light"
             className="w-full flex justify-start"
-            onPress={deleteHandler}
+            onPress={deleteDialogModal.onOpen}
           >
             Delete
           </Button>
@@ -110,11 +112,39 @@ export default function OptionsPopover({
       </Popover>
 
       <ModifyModal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
+        isOpen={modifyModal.isOpen}
+        onOpenChange={modifyModal.onOpenChange}
         defaultValues={values}
         fetchTasks={fetchTasks}
       />
+
+      <Modal
+        backdrop="blur"
+        onOpenChange={deleteDialogModal.onOpenChange}
+        isOpen={deleteDialogModal.isOpen}
+      >
+        <ModalContent>
+          <ModalHeader>Are you sure you want to delete this task?</ModalHeader>
+          <ModalBody>
+            <p>
+              This action cannot be undone. This will permanently delete the
+              task.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="danger"
+              variant="light"
+              onPress={deleteDialogModal.onClose}
+            >
+              Cancel
+            </Button>
+            <Button color="danger" onPress={deleteHandler}>
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

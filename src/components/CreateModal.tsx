@@ -38,7 +38,7 @@ export default function CreateModal({
     }
 
     const deadline = new Date(deadlineDate + " " + deadlineTime);
-    const { data, error } = await supabase.from("tasks").insert([
+    const { error } = await supabase.from("tasks").insert([
       {
         title,
         description,
@@ -48,8 +48,7 @@ export default function CreateModal({
     if (error) {
       setError("Could not create task");
       setIsLoading(false);
-    }
-    if (data) {
+    } else {
       setTitle("");
       setDescription("");
       setDeadlineDate("");
