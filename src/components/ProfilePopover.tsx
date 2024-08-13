@@ -1,6 +1,10 @@
 import { supabase } from "../config/supabaseClient";
 import { useAuth } from "../hooks/AuthProvider";
-import { faPhone, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faLaptop,
+  faPhone,
+  faSignOutAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Avatar,
@@ -14,9 +18,9 @@ import {
   RadioGroup,
   User,
 } from "@nextui-org/react";
-import { useState } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { useTheme } from "../hooks/use-theme";
 
 export default function ProfilePopover() {
   const { user, signOut } = useAuth();
@@ -48,7 +52,31 @@ export default function ProfilePopover() {
     },
   });
 
-  const [theme, setTheme] = useState<string | null>("dark");
+  const { theme, setLightTheme, setDarkTheme } = useTheme();
+
+  const handleThemeChange = (theme: string) => {
+    switch (theme) {
+      case "light":
+        setLightTheme();
+        break;
+      case "dark":
+        setDarkTheme();
+        break;
+      case "system":
+        const systemPrefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        if (systemPrefersDark) {
+          setDarkTheme();
+        } else {
+          setLightTheme();
+        }
+        break;
+      default:
+        console.warn("Unknown theme:", theme);
+        break;
+    }
+  };
 
   return (
     <>
@@ -115,13 +143,21 @@ export default function ProfilePopover() {
             label="Switch the theme of the app"
             value={theme}
             onChange={(e) => {
-              setTheme(e.target.value);
+              handleThemeChange(e.target.value);
             }}
           >
             <Radio value="dark">Dark</Radio>
             <Radio value="light">Light</Radio>
-            <Radio value="system">System</Radio>
           </RadioGroup>
+          <Button
+            startContent={<FontAwesomeIcon icon={faLaptop} />}
+            onPress={() => handleThemeChange("system")}
+            fullWidth
+            className="mt-4"
+            variant="light"
+          >
+            System
+          </Button>
 
           <Divider className="my-3" />
 

@@ -5,7 +5,6 @@ import App from "./App.tsx";
 import { Provider } from "./provider.tsx";
 import "./styles/globals.css";
 import { NextUIProvider } from "@nextui-org/react";
-import NavbarComponent from "./components/NavbarComponent.tsx";
 import DefaultLayout from "./layouts/default.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -13,7 +12,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <NextUIProvider>
       <Provider>
         <DefaultLayout>
-          <main className="dark text-foreground bg-background">
+          <main className="text-foreground bg-background">
             <App />
           </main>
         </DefaultLayout>
