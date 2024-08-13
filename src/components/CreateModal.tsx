@@ -88,6 +88,7 @@ export default function CreateModal({
                     />
                     <TimeInput
                       label="Deadline Time"
+                      // TODO: Fix the time input (it is less by 1 hour)
                       onChange={(value) => setDeadlineTime(value.toString())}
                     />
                   </div>

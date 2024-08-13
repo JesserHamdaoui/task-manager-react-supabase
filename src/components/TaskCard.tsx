@@ -33,7 +33,6 @@ export default function TaskCard({
       .eq("id", task.id);
 
     if (error) {
-      console.log(error);
     } else {
       setIsComplete(!isComplete);
     }

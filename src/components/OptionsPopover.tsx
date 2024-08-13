@@ -39,7 +39,6 @@ export default function OptionsPopover({
       },
     ]);
     if (error) {
-      console.log(error);
     }
     if (data) {
       fetchTasks();
@@ -52,7 +51,6 @@ export default function OptionsPopover({
       .delete()
       .eq("id", values.id);
     if (error) {
-      console.log(error);
     }
     if (data) {
       fetchTasks();

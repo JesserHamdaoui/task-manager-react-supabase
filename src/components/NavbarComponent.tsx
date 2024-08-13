@@ -19,7 +19,7 @@ import {
 import { SearchContext } from "../Providers/SearchProvider";
 import { useContext } from "react";
 import { useLocation } from "react-router-dom";
-import { useAuth } from "../Providers/AuthProvider";
+import { useAuth } from "../hooks/AuthProvider";
 
 export default function NavbarComponent() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

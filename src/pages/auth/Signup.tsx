@@ -42,7 +42,6 @@ export default function Signup() {
     if (error) {
       setAuthError(error.message);
     } else if (data) {
-      console.log(data);
     }
   };
 

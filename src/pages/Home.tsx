@@ -9,7 +9,7 @@ import FiltersPopover from "../components/FiltersPopover";
 import { SearchContext } from "../Providers/SearchProvider";
 import { useDisclosure } from "@nextui-org/react";
 import CreateModal from "../components/CreateModal";
-import { useAuth } from "../Providers/AuthProvider";
+import { useAuth } from "../hooks/AuthProvider";
 
 type Task = {
   id: Number;
@@ -55,7 +55,7 @@ export default function Home() {
     if (error) {
       setFetchError("Could not fetch tasks");
       setTasks([]);
-      console.log(error);
+
       setIsLoading(false);
     }
     if (data) {
@@ -86,8 +86,6 @@ export default function Home() {
   }, [isCompleteDisplayed, isDeadlineDisplayed, search]);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-  console.log(tasks);
 
   return (
     <div className="">

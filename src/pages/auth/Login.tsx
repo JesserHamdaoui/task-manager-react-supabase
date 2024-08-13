@@ -23,7 +23,6 @@ export default function Login() {
     if (error) {
       setError(error.message);
     } else if (data) {
-      console.log(data);
     }
     setIsLoading(false);
   };

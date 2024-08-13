@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Authentication from "./pages/auth/Authentication";
-import { AuthProvider } from "./Providers/AuthProvider";
+import { AuthProvider } from "./hooks/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthRoute from "./components/AuthRoute";
 

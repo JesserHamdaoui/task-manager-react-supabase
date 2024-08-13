@@ -1,4 +1,4 @@
-import { AuthProvider } from "../Providers/AuthProvider";
+import { AuthProvider } from "../hooks/AuthProvider";
 import SearchProvider from "../Providers/SearchProvider";
 import NavbarComponent from "../components/NavbarComponent";
 
